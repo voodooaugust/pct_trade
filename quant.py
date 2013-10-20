@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+pandas.set_option('display.max_columns',30)
+
 class master(DataFrame):
 	def __init__(self):
 		print 'initilize the master dataframe'
 	def printme(self):
 		pass
-
 
 dfout = read_csv('df_main.csv',index_col=0)
 dfout = dfout[['code','OUT_STANDING']]
@@ -40,6 +41,7 @@ def df(period):
 	folder = 'stock_dataframe//'
 	files = os.listdir(folder)
 	dflist = []
+	dfout = read_csv('df_main.csv',index_col=0)
 	for each in files[-period:]:
 		print 'filename : %s ' % each
 		fullname = folder + each
@@ -68,13 +70,12 @@ def df(period):
 	master = master.sort('avg',ascending=0)
 	master = master[:40]
 	# master dataframe is the result of pct trade
-	print master
+	print master.ix[:,-9:]
 	print 'the current breakthrough of trade: '
-	print master[master.iloc[:,-2] > master.iloc[:,-1]]
+	bt = master[master.iloc[:,-2] > master.iloc[:,-1]]
+	print bt.ix[:,-9:]
 	master.to_csv('trade_result.csv')
-
-def quant1(master):
-	pass
+	return master, bt
 
 
 # after construct the dataframe list
@@ -92,4 +93,4 @@ def ts():
 
 if __name__ == '__main__':
 	updateQOUTATION()
-	df(9)
+	df20 = df(20)

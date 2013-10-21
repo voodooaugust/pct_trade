@@ -21,7 +21,7 @@ class yahoofin():
 		df = df.sort_index()
 		df.rename(columns={'Adj Close':'ac'},inplace=1)
 		df.columns = [x.lower() for x in df.columns]
-		print 'save the file to %s\\yahoodata\\' % self.pathfolder
+		print 'save the file to %s\\yahoodata\\%s' % (self.pathfolder , name)
 		df.to_csv(self.pathfolder+'/yahoodata/'+name+'.csv')
 		return df
 	def dataoo(self,ls):
@@ -53,7 +53,7 @@ class yahoofin():
 	def plotkurtskew(self,d1):
 		v1 = {}
 		print 'the idxmin :::: \n'
-		print d1.idxmin()
+		print d1.idxmin(skipna=1)
 		for i, x in d1.idxmin().iteritems():
 			v1.update({i:d1[i].ix[x:]})
 		v1 = DataFrame(v1)
@@ -69,6 +69,7 @@ class yahoofin():
 		d = self.dataoo(ls)
 		print 'historical statistics kurt and skew'
 		self.kurtskew()
+		plt.figure()
 		print '\n\nthe recovery after max drop \n'
 		result = self.plotkurtskew(self.v1)
 		return result

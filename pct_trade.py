@@ -97,6 +97,7 @@ class qoutation:
         self.df_stock = 'stock_dataframe\\'
         self.filelist = os.listdir(self.folderpath)
         self.dflist = os.listdir(self.df_stock)
+    '''
     def retriMajorStockList(self):
         self.md = self.downloadqout()
         self.ls =self.parseQoutation(self.md)
@@ -104,6 +105,7 @@ class qoutation:
             for item in self.ls:
                 f.write('%s\n' % item[0])
             f.close()
+    '''
     def downloadqout(self,timerange):
         print 'begining download qouation from hkex'
         date = self.setDate(timerange)
@@ -115,10 +117,11 @@ class qoutation:
         print 'finish download the quatation files \n\nwith timerange %s\
         \n\nexit from procedure dowloadqout' % timerange
     # parseqoutation and output to the df_stock folder with DataFrame dtype
+    '''
     def parseQoutation(self,massdata,datecode):
         try:
-            starting_word = r' +1 CHEUNG KONG      HKD'
-            ending_word = r' +6889 DYNAM JAPAN      HKD'
+            starting_word = r' +1.+?HKD'
+            ending_word = r' +6898.+?HKD'
             s_pt = re.search(starting_word,massdata).start()
             e_pt = re.search(ending_word,massdata).end() + 123
             data =  massdata[s_pt:e_pt]
@@ -130,16 +133,18 @@ class qoutation:
             return ls
         finally:
             print 'finish parseQoutation with datecode : %s' % datecode
+    
     def tocsvfile(self,ls,datecode):
         print 'putting the file to stock_dataframe : %s' % datecode
         colname = ['code','name','cur','pclose','ask','high','SH_TRADE','close','bid','low','turn']
         df = DataFrame(ls,columns=colname)
         df.to_csv('stock_dataframe\\df_'+ datecode +'.txt',index = 0)
+    '''
     def setDate(self,daterange):
         today = date.today()
         datelist = []
         for x in range(daterange):
-            day = today - timedelta(x)
+            day = today - timedelta(x+1)
             if day.weekday() not in [5,6]:
                 datelist.append(day.strftime('%y%m%d'))
                 print day.strftime('%y%m%d')
@@ -168,6 +173,7 @@ class qoutation:
             self.sl = ls
             return ls
     # the old dataframe construction to the from folder qoutation
+    '''
     def constructDataFrame(self):
         filelist = os.listdir(self.folderpath)
         for each in filelist:
@@ -190,6 +196,7 @@ class qoutation:
             each['pct'] = each.trade/each.ss
             e = each.sort('pct',ascending=0)
             print e[:10]
+    '''
     def updateDataFrame(self,t):
         filelist = os.listdir(self.folderpath)
         lastfile = filelist[-t:]
@@ -202,8 +209,8 @@ class qoutation:
                 if os.path.getsize(filename) > 5000:
                     datecode = each.strip('q.txt')
                     f = open(filename)
-                    ls = self.parseQoutation(f.read(),datecode)
-                    self.tocsvfile(ls,datecode)
+                    ls = self.returnDATA(f.read(),datecode)
+                    ls.to_csv('stock_dataframe\\df_'+ datecode +'.txt',index = 0)
                     f.close()
     def updateQoutation(self):
         t = self.returnDays()
@@ -214,6 +221,17 @@ class qoutation:
         self.downloadqout(t)
         self.updateDataFrame(t)        
         print 'finish updateall qoutation with days: %s' % t
+
+
+    def returnDATA(self,rawdata, datecode):
+        pat2 = ' +(\\d+) (.+) (HKD) +([\\d|\\.|-]+) +([\\d|\\.|-]+) +([\\d|\\.|-]+) +([\\d|\\,|-]+)\n +([\\d|\\.|-]+) +([\\d|\\.|-]+) +([\\d|\\.|-]+) +([\\d|\\,|-]+)'
+        fr = DataFrame(re.findall(pat2,rawdata))
+        fr.replace(r'-','0',inplace=True)
+        fr[fr.columns[3:]] = fr.ix[:,3:].applymap(lambda x:x.replace(',','')).astype(float)
+        colname = ['code','name','cur','pclose','ask','high','SH_TRADE','close','bid','low','turn']
+        fr.columns = colname
+        print 'finish returnDATA with datecode : %s' % datecode
+        return fr
 #  update/get days diff > downloadqout > parseQoutation > tocsvfile
 # 
 # 

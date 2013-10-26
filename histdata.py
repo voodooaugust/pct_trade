@@ -21,7 +21,11 @@ class yahoofin():
 		df = df.sort_index()
 		df.rename(columns={'Adj Close':'ac'},inplace=1)
 		df.columns = [x.lower() for x in df.columns]
+<<<<<<< HEAD
 		print 'save the file to %s\\yahoodata\\' % self.pathfolder
+=======
+		print 'save the file to %s\\yahoodata\\%s' % (self.pathfolder , name)
+>>>>>>> b1
 		df.to_csv(self.pathfolder+'/yahoodata/'+name+'.csv')
 		return df
 	def dataoo(self,ls):
@@ -50,11 +54,34 @@ class yahoofin():
 
 		else:
 			print 'no data in the object '
+<<<<<<< HEAD
 	def plotkurtskew(self,v1):
+=======
+	def plotkurtskew(self,d1):
+		v1 = {}
+		print 'the idxmin :::: \n'
+		print d1.idxmin(skipna=1)
+		for i, x in d1.idxmin().iteritems():
+			v1.update({i:d1[i].ix[x:]})
+		v1 = DataFrame(v1)
+>>>>>>> b1
 		v2 = {'kurt':v1.kurt(),'skew':v1.skew(),'std':v1.std(),'mean':v1.mean()}
 		v2 = DataFrame(v2)
 		print 'kurt and skew statistics summary\n'
 		print v2
 		plt.scatter(v2['skew'],v2['kurt'],s=v2['std']*(10**4),alpha=0.5)
 		for label, x, y in zip(v2.index.values, v2['kurt'],v2['skew']):
+<<<<<<< HEAD
 			plt.annotate(label,xy=(y,x))
+=======
+			plt.annotate(label,xy=(y,x))
+		return v2
+	def recoveryrate(self,ls):
+		d = self.dataoo(ls)
+		print 'historical statistics kurt and skew'
+		self.kurtskew()
+		plt.figure()
+		print '\n\nthe recovery after max drop \n'
+		result = self.plotkurtskew(self.v1)
+		return result
+>>>>>>> b1

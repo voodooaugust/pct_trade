@@ -61,7 +61,7 @@ class yahoofin():
 		v2 = DataFrame(v2)
 		print 'kurt and skew statistics summary\n'
 		print v2
-		plt.scatter(v2['skew'],v2['kurt'],s=v2['std']*(10**4),alpha=0.5)
+		plt.scatter(v2['skew'],v2['kurt'],s=v2['std']*(10**4),alpha=0.3)
 		for label, x, y in zip(v2.index.values, v2['kurt'],v2['skew']):
 			plt.annotate(label,xy=(y,x))
 		return v2
@@ -69,6 +69,12 @@ class yahoofin():
 		d = self.dataoo(ls)
 		print 'historical statistics kurt and skew'
 		self.kurtskew()
+		plt.figure()
 		print '\n\nthe recovery after max drop \n'
 		result = self.plotkurtskew(self.v1)
 		return result
+	def v2plot(self):
+		plt.scatter(v2['skew'],v2['kurt'],s=v2['std']*(10**4),alpha=0.3)
+		for label, x, y in zip(v2.index.values, v2['kurt'],v2['skew']):
+			plt.annotate(label,xy=(y,x))
+		return v2

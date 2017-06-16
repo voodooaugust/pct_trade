@@ -6,9 +6,10 @@ import matplotlib
 import urllib
 import tempfile as tp
 import os
+import sys
 import requests
 from datetime import datetime
-matplotlib.style.use('ggplot')
+import time
         
 def downloadfile2(stock, f = 'sd1t1vml1c1p2k4k5a2'):
   
@@ -27,11 +28,29 @@ def downloadfile2(stock, f = 'sd1t1vml1c1p2k4k5a2'):
     data = data.set_index(['symbol']) 
     
     f.close()
+    print data
     return data 
     # construct multiIndex
     
-    
-        
+def getRecord(stock, period=10):
+    if period == None:
+        period = 10 
+    else:
+        period = int(period)
+    home = os.path.dirname(os.getcwd())
+    filename = '{:%Y%m%d-%H%M}'.format(datetime.today()) 
+
+    # dirname = '{:0>4}'.format(stock)
+    # for x in stock:
+    #     directory = os.join.path(home, x)
+    #     if not os.path.exists(directory):
+    #         os.makedirs(directory)
+    dest = os.path.join(home, 'data', filename)
+            
+    for x in range(period): 
+        data = downloadfile2(stock)
+        data.to_csv(dest)
+        time.sleep(180)
     # store data
 def quote():
     home = os.path.dirname(os.getcwd())
@@ -89,6 +108,10 @@ def getStocklist():
 #     d['{:0>4}'.format(code)] = histDownload(code)
 
 
-data = histDownload('1')
-print data
-
+if __name__ == '__main__':
+    if len(sys.argv) < 2 :
+        sys.exit()
+        print len(sys.argv)
+    print len(sys.argv)
+    arg = sys.argv
+    getRecord(arg[1:-1], arg[-1])

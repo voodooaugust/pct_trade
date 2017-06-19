@@ -11,7 +11,7 @@ import requests
 from datetime import datetime
 import time
         
-def downloadfile2(stock, f = 'sd1t1vml1c1p2k4k5a2'):
+def downloadfile(stock, f = 'sd1t1vml1c1p2k4k5a2'):
   
     baseurl = 'http://finance.yahoo.com/d/quotes.csv?%s'
     stock = ['{:0>4}'.format(x) + '.HK' for x in stock]
@@ -48,7 +48,7 @@ def getRecord(stock, period=10):
     dest = os.path.join(home, 'data', filename)
             
     for x in range(period): 
-        data = downloadfile2(stock)
+        data = downloadfile(stock)
         data.to_csv(dest)
         time.sleep(180)
     # store data
@@ -66,7 +66,7 @@ def quote():
         return ls
     def a2():
         ls = getStocklist()
-        downloadfile2(ls[0])
+        downloadfile(ls[0])
         
         
     ls = getStocklist()
@@ -74,26 +74,43 @@ def quote():
     d = pd.DataFrame()
     for x in range(15):
         code = list(ls['STOCK CODE'][x*100:(x+1)*100])
-        data = downloadfile2(code)
+        data = downloadfile(code)
     #     print data
         d = d.append(data)
     d = d[d['volume'] > 0]
     d.to_csv(datahome)    
     # codeset = list(ls['STOCK CODE'][1500:])
-    # downloadfile2(codeset)
+    # downloadfile(codeset)
 
 
 
 def histDownload(code):
-    code = 'HKG:' + '{:0>4}'.format(code)
-    baseurl = 'https://www.google.com/finance/historical?%s'
-    s = urllib.urlencode({'q': code, 'output': 'csv'})
-    url = baseurl % s
-    print s, url
-    try:
-        return pd.read_csv(url)
-    except:
-        print 'error on downloading'
+    code = '{:0>4}.hk'.format(code)
+    home = os.path.dirname(os.getcwd())
+    datadir = os.path.join(home, 'data', code + '.csv')
+    def datetime_timestamp(dt):
+         time.strptime(dt, '%Y-%m-%d %H:%M:%S')
+         s = time.mktime(time.strptime(dt, '%Y-%m-%d %H:%M:%S'))
+         return str(int(s))
+
+    s = requests.Session()
+
+    #Replace B=xxxx
+    cookies = dict(B='c650m5hchrhii&b=3&s=tk')
+
+    #Replace crumb=yyyy
+    crumb = 'NMhMTCv7QpM'
+
+    begin = datetime_timestamp("2014-01-01 09:00:00")
+
+    end =  str(int(time.time()))
+    
+    r = s.get("https://query1.finance.yahoo.com/v7/finance/download/%s?period1=" % code
+              +begin+"&period2="+end+"&interval=1d&events=history&crumb="+crumb,cookies=cookies,verify=False)
+    
+    f = open(datadir, 'w')
+    f.write(r.text)
+    f.close()
 
 def getStocklist():
     home = os.path.dirname(os.getcwd())
@@ -109,9 +126,10 @@ def getStocklist():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2 :
-        sys.exit()
-        print len(sys.argv)
-    print len(sys.argv)
-    arg = sys.argv
-    getRecord(arg[1:-1], arg[-1])
+    # if len(sys.argv) < 2 :
+    #     sys.exit()
+    #     print len(sys.argv)
+    # print len(sys.argv)
+    # arg = sys.argv
+    # getRecord(arg[1:-1], arg[-1])
+    histDownload(939)

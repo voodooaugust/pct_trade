@@ -54,7 +54,7 @@ def getRecord(stock, period=10):
     # store data
 def quote():
     home = os.path.dirname(os.getcwd())
-    datahome = os.path.join(home, 'data', 'result.csv')
+    datahome = os.path.join(home, 'data','')
         
         # timestr = datetime.strftime(datetime.now(), '%D%H%M')
         # data.to_csv(os.path.join(datahome, timestr + '.csv'), index=False)
@@ -70,15 +70,29 @@ def quote():
         
         
     ls = getStocklist()
-    code = ['1398', '939', '1']
+    # code = ['1398', '939', '1']
     d = pd.DataFrame()
-    for x in range(15):
-        code = list(ls['STOCK CODE'][x*100:(x+1)*100])
-        data = downloadfile(code)
-    #     print data
-        d = d.append(data)
-    d = d[d['volume'] > 0]
-    d.to_csv(datahome)    
+
+
+
+    # can be set to time end at 1600
+    # store data to data directory
+    now = datetime.now()
+    count = 0
+    while not ((now.hour > 15) and (now.minute >20)):
+        d = pd.DataFrame()
+        for x in range(0, len(ls), 100):
+            code = ls['STOCK CODE'][x:x+100]
+            data = downloadfile(code)
+        #     print data
+            d = d.append(data)
+            d = d[d['volume'] > 0]
+            print d
+        d.to_csv(datahome + '{:0>2}.csv'.format(count))    
+        now = datetime.now()
+        print 'current time {}'.format (now)
+        count += 1
+        time.sleep(180)
     # codeset = list(ls['STOCK CODE'][1500:])
     # downloadfile(codeset)
 
@@ -126,10 +140,16 @@ def getStocklist():
 
 
 if __name__ == '__main__':
-    # if len(sys.argv) < 2 :
-    #     sys.exit()
-    #     print len(sys.argv)
-    # print len(sys.argv)
-    # arg = sys.argv
-    # getRecord(arg[1:-1], arg[-1])
-    histDownload(939)
+    if len(sys.argv) == 2 :
+        sys.exit()
+        print len(sys.argv)
+    elif len(sys.argv) == 1:
+        print 'programme started'
+        quote()
+
+    print len(sys.argv)
+    arg = sys.argv
+    # histDownload(939)
+
+
+    print 'all is done'

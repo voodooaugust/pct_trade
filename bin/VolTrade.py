@@ -10,6 +10,10 @@ import sys
 import requests
 from datetime import datetime
 import time
+
+
+homedir = os.path.dirname(os.getcwd())
+datadir = os.path.join(homedir, 'data')
         
 def downloadfile(stock, f = 'sd1t1vml1c1p2k4k5a2'):
   
@@ -53,8 +57,6 @@ def getRecord(stock, period=10):
         time.sleep(180)
     # store data
 def quote():
-    home = os.path.dirname(os.getcwd())
-    datahome = os.path.join(home, 'data','')
         
         # timestr = datetime.strftime(datetime.now(), '%D%H%M')
         # data.to_csv(os.path.join(datahome, timestr + '.csv'), index=False)
@@ -73,12 +75,13 @@ def quote():
     # code = ['1398', '939', '1']
     d = pd.DataFrame()
 
-
+    today = datetime.today()
 
     # can be set to time end at 1600
     # store data to data directory
     now = datetime.now()
     count = 0
+
     while not ((now.hour > 15) and (now.minute >20)):
         d = pd.DataFrame()
         for x in range(0, len(ls), 100):
@@ -88,9 +91,15 @@ def quote():
             d = d.append(data)
             d = d[d['volume'] > 0]
             print d
-        d.to_csv(datahome + '{:0>2}.csv'.format(count))    
+        filename = '{} - {:0>2}.csv'.format(today.strftime('%Y%m%d'), count)
+        dest = os.path.join(datadir, filename)
+        d.to_csv(dest)    
         now = datetime.now()
-        print 'current time {}'.format (now)
+        
+        print 'current time {}'.format(now)
+        print 'No of loop {}'.format(count)
+        print 'file name : {}'.format(filename)
+
         count += 1
         time.sleep(180)
     # codeset = list(ls['STOCK CODE'][1500:])
@@ -148,8 +157,8 @@ if __name__ == '__main__':
         quote()
 
     print len(sys.argv)
-    arg = sys.argv
     # histDownload(939)
+
 
 
     print 'all is done'
